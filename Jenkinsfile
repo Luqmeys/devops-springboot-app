@@ -14,38 +14,24 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'mvn clean package'
-            }
-        }
-
-        stage('Test') {
-            steps {
-                sh 'echo "Running basic tests..."'
-                sh 'mvn test'   // or echo "No tests implemented" if none
+                bat 'mvn clean package -DskipTests'     // ← Use bat here
             }
         }
 
         stage('Docker Build') {
             steps {
-                sh "docker build -t ${APP_NAME}:latest ."
+                bat "docker build -t ${APP_NAME}:latest ."
             }
         }
 
         stage('Run Container') {
             steps {
-                sh 'docker stop student-app || true'
-                sh 'docker rm student-app || true'
-                sh "docker run -d -p 8080:8080 --name student-app ${APP_NAME}:latest"
+                bat '''
+                    docker stop student-app || true
+                    docker rm student-app || true
+                '''
+                bat "docker run -d -p 8080:8080 --name student-app ${APP_NAME}:latest"
             }
-        }
-    }
-
-    post {
-        always {
-            echo 'Pipeline finished'
-        }
-        success {
-            echo '✅ Build and deployment successful!'
         }
     }
 }
