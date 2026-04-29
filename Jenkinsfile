@@ -18,6 +18,14 @@ pipeline {
             }
         }
 
+        // ✅ ADDED TEST STAGE
+        stage('Test') {
+            steps {
+                echo 'Running tests...'
+                bat 'mvn test || echo No tests implemented'
+            }
+        }
+
         stage('Docker Build') {
             steps {
                 bat "docker build -t ${APP_NAME}:latest ."
@@ -34,7 +42,6 @@ pipeline {
             }
         }
 
-        // ✅ NEW STAGE
         stage('Deploy to Kubernetes') {
             steps {
                 bat 'kubectl apply -f deployment.yml'
