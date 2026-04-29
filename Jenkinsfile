@@ -14,7 +14,7 @@ pipeline {
 
         stage('Build') {
             steps {
-                bat 'mvn clean package -DskipTests'     // ← Use bat here
+                bat 'mvn clean package -DskipTests'
             }
         }
 
@@ -27,11 +27,31 @@ pipeline {
         stage('Run Container') {
             steps {
                 bat '''
-                    docker stop student-app || true
-                    docker rm student-app || true
+                    docker stop student-app || exit 0
+                    docker rm student-app || exit 0
                 '''
                 bat "docker run -d -p 8080:8080 --name student-app ${APP_NAME}:latest"
             }
+        }
+
+        // ✅ NEW STAGE
+        stage('Deploy to Kubernetes') {
+            steps {
+                bat 'kubectl apply -f deployment.yml'
+                bat 'kubectl apply -f service.yml'
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline finished'
+        }
+        success {
+            echo '✅ Deployment to Kubernetes successful!'
+        }
+        failure {
+            echo '❌ Pipeline failed!'
         }
     }
 }
