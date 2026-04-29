@@ -13,9 +13,8 @@ spec:
         app: springboot-app
     spec:
       containers:
-      - name: springboot-app
-        image: student-app:latest
-        imagePullPolicy: Never          # Important for local testing with Minikube
-        ports:
-        - containerPort: 8080## YAML Template.
----
+        - name: springboot-app
+          image: student-app:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
